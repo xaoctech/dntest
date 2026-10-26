@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"strconv"
@@ -49,8 +50,14 @@ func download(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := flag.Int("port", Port, "HTTP listen port (1-65535)")
+	flag.Parse()
+	if *port < 1 || *port > 65535 {
+		log.Fatal("port must be between 1 and 65535")
+	}
+
 	http.HandleFunc("/dntest.php", download)
 	log.Printf("Download tests service v%s (%s)\n", Version, VersionTime)
-	log.Printf("Listening on :%d", Port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(Port), nil))
+	log.Printf("Listening on :%d", *port)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
 }
